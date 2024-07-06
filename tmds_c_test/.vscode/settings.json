@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "tmds_encoder.h": "c",
+        "utility.h": "c",
+        "cstdlib": "c",
+        "math.h": "c"
+    }
+}

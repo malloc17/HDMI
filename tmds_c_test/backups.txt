@@ -1,0 +1,113 @@
+// PUBLIC unsigned short encode_1(unsigned char data, char * balance_acc)
+// {
+//     unsigned short trans_minimized_data;
+//     unsigned char sum_of_ones, sum_of_zeros;
+//     char invert_flag;
+//     unsigned char temp_data;
+//     unsigned short encoded_data;
+//     unsigned char gate_type;
+
+//     trans_minimized_data = transition_minimize_encoding(data);
+//     if(trans_minimized_data > TEMP_DATA_THR_MAX || trans_minimized_data < TEMP_DATA_THR_MIN)
+//         print_log(FATAL, "trans_minimized_data = 0x%x is not in range!\nFILE: %s\nLINE: %d\n", trans_minimized_data, __FILE__, __LINE__);		
+
+//     print_log(DEBUG, "trans_minimized_data = 0x%x\n",trans_minimized_data);
+//     sum_of_ones = calculate_ones(&trans_minimized_data, TEMP_DATA_SIZE);
+//     sum_of_zeros = TEMP_DATA_SIZE - sum_of_ones;
+
+//     print_log(DEBUG, "Sum of ones after getting trans_minimized_data: %d\n", sum_of_ones);
+//     print_log(DEBUG, "Sum of zeros after getting trans_minimized_data: %d\n", sum_of_zeros);
+//     if(*balance_acc >= 0)
+//     {
+//         if(sum_of_ones <= 4 )	
+//             invert_flag = 0;
+//         else
+//             invert_flag = 1;                      
+//     }
+// 	else
+//     {  
+//         if(sum_of_zeros <= 4 )
+//             invert_flag = 0;
+//         else
+//             invert_flag = 1;
+//     }
+    
+
+//     temp_data = trans_minimized_data & 0xFF;
+
+//     gate_type = BIT_MASK(trans_minimized_data, TEMP_DATA_SIZE - 1);
+
+//     if(invert_flag)
+//         encoded_data = ~temp_data & 0xFF;   /* ~ operator promote temp_data to integer. FFFFFFxx  */
+//     else
+//         encoded_data = temp_data; 
+
+//     encoded_data |= LEFT_SHIFT_BIT(invert_flag, ENCODED_DATA_SIZE - 1) | LEFT_SHIFT_BIT(gate_type,TEMP_DATA_SIZE - 1);
+//     if(encoded_data > ENCODED_DATA_THR_MAX || encoded_data < ENCODED_DATA_THR_MIN)
+//         print_log(FATAL, "Encoded = 0x%x is not in range!\nFILE: %s\nLINE: %d\n", encoded_data, __FILE__, __LINE__);
+//     // printf("encoded_data = 0x%x\n",encoded_data);
+//     print_log(DEBUG, "encoded_data = 0x%x\n", encoded_data);
+//     // encoded_data &= 0x3FF; /* ~ operator promote temp_data to integer*/
+//     sum_of_ones = calculate_ones(&encoded_data, ENCODED_DATA_SIZE);
+//     sum_of_zeros = ENCODED_DATA_SIZE - sum_of_ones;
+
+//     // printf("Sum_of_ones = %d\nsum_of_zeros = %d\n",sum_of_ones, sum_of_zeros);
+//     print_log(DEBUG, "Sum_of_ones  = %d\n", sum_of_ones);
+//     print_log(DEBUG, "Sum_of_zeros = %d\n",  sum_of_zeros);
+//     *balance_acc += sum_of_ones - sum_of_zeros;
+
+//     return encoded_data;
+// }
+
+
+
+
+// char test_encode()
+// {
+// 	char balance_acc_1 = 0;
+// 	char balance_acc_2 = 0;
+// 	unsigned char data;
+// 	unsigned short encoded_data_1;
+// 	unsigned short encoded_data_2;
+// 	int is_logged = -1;
+// 	int sum_of_balance_1 = 0;
+// 	int sum_of_balance_2 = 0;
+
+// 	int hist_1[HIST_SIZE] = {0}; // All starts with zero
+// 	int hist_2[HIST_SIZE] = {0}; // All starts with zero
+// 	for(int j = 0 ; j < LOOP_NUMBER ; ++j)
+// 	{
+// 		if(is_logged == 1)
+// 			PRINT_ITER_W_DASHES(j+1);		
+// 		data = (unsigned char) (rand() % (int) pow(2,DATA_SIZE));
+
+// 		if(data > DATA_THR_MAX || data < DATA_THR_MIN)
+// 			is_logged = print_log(FATAL, "Data = 0x%x is not in range! Iteration: %d/%d\nFILE: %s\nLINE: %d\n", data, j, LOOP_NUMBER, __FILE__, __LINE__);
+// 		is_logged = print_log(DEBUG, "Data = 0x%x\n", data);
+// 		encoded_data_1 = encode_1(data, &balance_acc_1);
+// 		encoded_data_2 = encode_2(data, &balance_acc_2);
+
+// 		if((balance_acc_1 > (char)(DC_BALANCE_THRESHOLD_MAX)) || (balance_acc_1 <  (char)(DC_BALANCE_THRESHOLD_MIN)))
+// 			is_logged = print_log(ERROR, "DC balance = %d exceed the threshold! Iteration: %d/%d\nFILE: %s\nLINE: %d\n", balance_acc_1, j, LOOP_NUMBER, __FILE__, __LINE__);
+
+// 		if((balance_acc_2 > (char)(DC_BALANCE_THRESHOLD_MAX)) || (balance_acc_2 <  (char)(DC_BALANCE_THRESHOLD_MIN)))
+// 			is_logged = print_log(FATAL, "DC balance = %d exceed the threshold! Iteration: %d/%d\nFILE: %s\nLINE: %d\n", balance_acc_2, j, LOOP_NUMBER, __FILE__, __LINE__);
+
+// 		sum_of_balance_1 += balance_acc_1;
+// 		sum_of_balance_2 += balance_acc_2;
+		
+// 		is_logged = print_log(INFO,"Encoded Data 1: 0x%x\n",encoded_data_1);
+// 		is_logged = print_log(INFO,"Balance Accumulator 1 value: %d\n", balance_acc_1);
+// 		is_logged = print_log(INFO,"Total sum of balance Accumulator 1: %d\n", sum_of_balance_1);
+		
+// 		is_logged = print_log(INFO,"Encoded Data 2: 0x%x\n",encoded_data_2);
+// 		is_logged = print_log(INFO,"Balance Accumulator 2 value: %d\n", balance_acc_2);
+// 		is_logged = print_log(INFO,"Total sum of balance Accumulator 2: %d\n", sum_of_balance_2);
+
+// 		++hist_1[balance_acc_1 + OFFSET_FOR_NEG_IND];
+// 		++hist_2[balance_acc_2 + OFFSET_FOR_NEG_IND];
+// 	}
+// 	print_Histogram(hist_1);
+// 	print_Histogram(hist_2);
+// 	return SUCCESS;
+// }
